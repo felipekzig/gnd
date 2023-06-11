@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -9,16 +10,16 @@ import (
 type Task struct {
 	ID        uint `gorm:"primaryKey;autoIncrement"`
 	Task      string
-	Priority  uint16
 	Pings     uint16
-	Done      bool `gorm:"default:false"`
+	Done      bool      `gorm:"default:false"`
+	DueDate   time.Time `gorm:"default:null"`
 	CreatedAt int
 	UpdatedAt int
 	DeletedAt int
 }
 
 type TaskService interface {
-	Add(task string, priority uint16) (Task, error)
+	Add(task string, dueDate time.Time) (Task, error)
 	Ping(taskID uint) (Task, error)
 	List(all bool) ([]Task, error)
 	Complete(taskID uint) (Task, error)
@@ -28,8 +29,8 @@ type taskService struct {
 	db *gorm.DB
 }
 
-func (s *taskService) Add(task string, priority uint16) (Task, error) {
-	e := &Task{Task: task, Priority: priority}
+func (s *taskService) Add(task string, dueDate time.Time) (Task, error) {
+	e := &Task{Task: task, DueDate: dueDate}
 	r := s.db.Create(&e)
 	if r.Error != nil {
 		return Task{}, r.Error
@@ -60,7 +61,7 @@ func (s *taskService) Ping(taskID uint) (Task, error) {
 func (s *taskService) List(all bool) ([]Task, error) {
 	var tasks []Task
 
-	q := s.db.Order("priority DESC, pings DESC")
+	q := s.db.Order("due_date DESC, pings DESC")
 
 	if !all {
 		q = q.Where("done IS FALSE")
