@@ -1,0 +1,32 @@
+builds:
+  - binary: gnd
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -mod=vendor
+
+release:
+  prerelease: auto
+
+universal_binaries:
+  - replace: true
+
+brews:
+  -
+    name: gnd
+    homepage: "https://github.com/felipekzig/gnd"
+    tap:
+      owner: felipekzig
+      name: homebrew-felipekzig
+    commit_author:
+      name: Felipe Zigmundo
+      email: felipekzig@gmail.com
+
+checksum:
+  name_template: 'checksums.txt'
