@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/araddon/dateparse"
 	"github.com/gnd/internal/domain"
 	"github.com/spf13/cobra"
 )
@@ -23,32 +24,37 @@ func defTimeValue(v time.Time) string {
 
 func Execute(ts domain.TaskService) {
 
+	var dueDateFlag *string
 	addCmd := &cobra.Command{
 		Use:       "add",
 		Short:     "Add a new task to the list",
-		ValidArgs: []string{"task", "priority"},
+		ValidArgs: []string{"task"},
 		Aliases:   []string{"a"},
-		Args: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 || len(args) > 2 {
-				return fmt.Errorf("\"add\" supports at most two arguments (task and due date)")
-			}
-
-			if len(args) == 1 {
-				return nil
-			}
-
-			_, err := time.Parse(time.DateOnly, args[1])
-			return err
-		},
 		Run: func(cmd *cobra.Command, args []string) {
-			var d time.Time
+			t := args[0]
 			if len(args) > 1 {
-				d, _ = time.Parse(time.DateOnly, args[1])
+				t = strings.Join(args, " ")
 			}
 
-			ts.Add(args[0], d)
+			if dueDateFlag == nil {
+				ts.Add(t, time.Time{})
+			}
+
+			dd, err := dateparse.ParseAny(*dueDateFlag)
+			if err != nil {
+				fmt.Println("Due date flag does not seem to be a valid date")
+				return
+			}
+
+			if dd.Before(time.Now()) {
+				fmt.Println("Due date can't be in the past")
+				return
+			}
+
+			ts.Add(t, dd)
 		},
 	}
+	dueDateFlag = addCmd.Flags().StringP("due-date", "d", "", "The due date for this task. Accepted formats: MM/DD/YYYY, MM-DD-YYYY")
 	gndRootCmd.AddCommand(addCmd)
 
 	listCmd := &cobra.Command{
@@ -73,7 +79,7 @@ func Execute(ts domain.TaskService) {
 					fmt.Printf("   |")
 
 				}
-				fmt.Printf("%4X | %-50s | %12s", t.ID, t.Task, defTimeValue(t.DueDate))
+				fmt.Printf("%4d | %-50s | %12s", t.ID, t.Task, defTimeValue(t.DueDate))
 				fmt.Print("\n")
 			}
 		},
