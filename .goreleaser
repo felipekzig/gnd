@@ -21,7 +21,7 @@ brews:
   -
     name: gnd
     homepage: "https://github.com/felipekzig/gnd"
-    tap:
+    repository:
       owner: felipekzig
       name: homebrew-felipekzig
     commit_author:
