@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/araddon/dateparse"
-	"github.com/gnd/internal/domain"
+	"github.com/felipekzig/gnd/internal/domain"
 	"github.com/spf13/cobra"
 )
 
