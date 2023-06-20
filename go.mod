@@ -1,4 +1,4 @@
-module github.com/gnd
+module github.com/felipekzig/gnd
 
 go 1.20
 
