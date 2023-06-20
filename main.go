@@ -3,8 +3,8 @@ package main
 import (
 	"path"
 
-	"github.com/gnd/internal/cli"
-	"github.com/gnd/internal/domain"
+	"github.com/felipekzig/gnd/internal/cli"
+	"github.com/felipekzig/gnd/internal/domain"
 	"github.com/mitchellh/go-homedir"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
